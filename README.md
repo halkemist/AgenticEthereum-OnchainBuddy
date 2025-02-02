@@ -5,3 +5,14 @@ Onchain Buddy is an AI assistant that helps beginners understand their blockchai
 As your personal blockchain companion he acts as a real-time translator between complex blockchain operations and everyday language.
 
 To making your first token swap or approving a new smart contract, it break down each action in clear and understandable explanations.
+
+## Stack:
+
+- Solidity
+- Next
+- Wagmi, Viem, Ethers
+- TailwindCSS
+- MUI
+- OnchainKit by Coinbase
+- The Graph
+- AgentKit
