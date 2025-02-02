@@ -13,8 +13,8 @@ To making your first token swap or approving a new smart contract, it break down
 - Wagmi, Viem, Ethers
 - TailwindCSS
 - MUI
-- OnchainKit by Coinbase
-- The Graph
+- OnchainKit by Coinbase (wallet integration)
+- The Graph (data querying)
 - AgentKit
 
 ## AI Agent features
@@ -40,3 +40,11 @@ NB: Explanation depends on your current level
 - Transaction Explorer
 - Learning Center
 - Settings
+
+## Flow
+
+User Wallet --> OnchainKit --> Frontend --> The Graph --> AI Agent --> Frontend
+
+## Blockchain
+
+I chose Base because of low fees transaction cost and fast confirmations.
