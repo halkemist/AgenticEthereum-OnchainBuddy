@@ -6,7 +6,7 @@ As your personal blockchain companion he acts as a real-time translator between 
 
 To making your first token swap or approving a new smart contract, it break down each action in clear and understandable explanations.
 
-## Stack:
+## Stack
 
 - Solidity
 - Next
@@ -16,3 +16,27 @@ To making your first token swap or approving a new smart contract, it break down
 - OnchainKit by Coinbase
 - The Graph
 - AgentKit
+
+## AI Agent features
+
+- Provide explanations of user transactions
+- Provide explanations of user approvals
+- Alert the user if a transaction looks risky
+- Daily suggestion based on yser activity
+- Update your level if you deserve it
+
+NB: Explanation depends on your current level
+
+## The Graph
+
+- Subgraph to index:
+  - Transactions history
+
+## User Interface
+
+### Pages
+
+- Dashboard
+- Transaction Explorer
+- Learning Center
+- Settings
