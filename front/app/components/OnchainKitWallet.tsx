@@ -1,14 +1,14 @@
 import { JSX } from "react"
 
 // OnchainKit components
-import { Wallet, ConnectWallet, WalletDropdown, WalletDropdownDisconnect } from "@coinbase/onchainkit/wallet"
+import { Wallet, ConnectWallet, WalletDropdown, WalletDropdownDisconnect, ConnectWalletText, WalletDropdownLink } from "@coinbase/onchainkit/wallet"
 import { Identity, Avatar, Address, EthBalance, Name } from "@coinbase/onchainkit/identity"
 
 const OnchainKitWallet: React.FunctionComponent = (): JSX.Element => {
   return (
-    <div>
+    <div> 
       <Wallet>
-        <ConnectWallet>
+        <ConnectWallet className="bg-yellow-400">
           <Avatar className="h-6 w-6" />
           <Name />
         </ConnectWallet>
