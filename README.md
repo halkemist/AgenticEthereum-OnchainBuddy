@@ -14,7 +14,6 @@ To making your first token swap or approving a new smart contract, it break down
 - TailwindCSS
 - MUI
 - OnchainKit by Coinbase (wallet integration)
-- The Graph (data querying)
 - AgentKit
 
 ## AI Agent features
@@ -27,11 +26,6 @@ To making your first token swap or approving a new smart contract, it break down
 
 NB: Explanation depends on your current level
 
-## The Graph
-
-- Subgraph to index:
-  - Transactions history
-
 ## User Interface
 
 ### Pages
@@ -43,7 +37,7 @@ NB: Explanation depends on your current level
 
 ## Flow
 
-User Wallet --> OnchainKit --> Frontend --> The Graph --> AI Agent --> Frontend
+User Wallet --> OnchainKit --> Frontend --> Query Last User Transactions --> AgentKit --> Frontend
 
 ## Blockchain
 
