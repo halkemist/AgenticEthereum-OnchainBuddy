@@ -1,12 +1,28 @@
 'use client';
+
 import { JSX } from "react";
 import Link from "next/link";
+
+// Hooks
+import { useAccount } from "wagmi";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+
+// Components
 import OnchainKitWallet from "../OnchainKitWallet";
 
 const Navigation: React.FunctionComponent = (): JSX.Element => {
 
   const path = usePathname();
+  const router = useRouter();
+  const { isConnected } = useAccount();
+
+  useEffect(() => {
+    if (!isConnected && path !== '/') {
+      router.push('/')
+    }
+  }, [isConnected])
 
   return (
     <>
