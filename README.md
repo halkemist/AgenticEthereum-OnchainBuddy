@@ -6,6 +6,10 @@ As your personal blockchain companion he acts as a real-time translator between 
 
 To making your first token swap or approving a new smart contract, it break down each action in clear and understandable explanations.
 
+## More Details
+
+[OnchainBuddy Notion](https://www.notion.so/ETHGlobal_OnchainBuddy-18fa0cf912048044a489c3bb8ddce7f3?pvs=4)
+
 ## Stack
 
 - Solidity
