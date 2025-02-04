@@ -11,7 +11,7 @@ const Navigation: React.FunctionComponent = (): JSX.Element => {
   return (
     <>
       {path !== '/' && (
-        <nav className="navigation fixed top-0 left-1/2 transform -translate-x-1/2 bg-white bg-opacity-80 backdrop-blur-md rounded-full shadow-md p-4 z-50">
+        <nav className="max-w-2xl mx-auto space-y-8 top-0 bg-white rounded-lg shadow-md p-4 z-50 mb-8">
           <ul className="flex items-center justify-center space-x-8">
               <li><Link href="/dashboard" className={path === "/dashboard" ? "active" : ""}>Dashboard</Link></li>
               <li><Link href="/transactions" className={path === "/transactions" ? "active" : ""}>Transactions</Link></li>
