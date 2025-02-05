@@ -57,7 +57,7 @@ const Dashboard: React.FC = () => {
   const testAddress = "0xEdb06c2Fc7cA9EBBCf83A3301482b79214E26404";
 
   async function handleTest() {
-    const txs = await getTransactions(testAddress, "base_mainnet", "1");
+    const txs = await getTransactions(testAddress, "base-mainnet", "10");
     console.log(txs)
   }
   //////////////////
