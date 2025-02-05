@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { SmartToy as BotIcon } from '@mui/icons-material';
 
+import { getTransactions } from '../utils/api';
+
 // Types
 interface Transaction {
   id: string;
@@ -50,6 +52,17 @@ const Dashboard: React.FC = () => {
     return new Date(timestamp).toLocaleDateString();
   };
 
+  // TEST PART
+  /////////////////////
+  const testAddress = "0xEdb06c2Fc7cA9EBBCf83A3301482b79214E26404";
+
+  async function handleTest() {
+    const txs = await getTransactions(testAddress, "base_mainnet", "1");
+    console.log(txs)
+  }
+  //////////////////
+  // END TEST PART
+
   return (
     <>
       {/* AI Assistant Chat Bubble */}
@@ -80,6 +93,10 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className='bg-white h-8 w-1/2'>
+        <button onClick={handleTest}>TEST</button>
       </div>
 
       {/* Recent Transactions */}
