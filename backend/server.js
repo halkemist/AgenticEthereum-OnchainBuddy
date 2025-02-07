@@ -18,14 +18,35 @@ const authenticate = async (request, reply) => {
 fastify.addHook('preHandler', authenticate);
 
 // Routes
-fastify.get('/', function (request, reply) {
-  reply.send({ hello: 'world' })
+fastify.get('/progress', async (request, reply) => {
+  const progress = request.body;
+  const saved = await prisma.userProgress.upsert({
+    where: { address: progress.address },
+    update: progress,
+    create: progress
+  });
+  return saved;
+});
+
+fastify.get('/progress/:address', async (request, reply) => {
+  const { address } = request.params;
+  const progress = await prisma.userProgress.findUnique({
+    where: { address }
+  });
+  return progress || {
+    address,
+    xp: 0,
+    level: 1,
+    transactionsAnalyzed: 0,
+    lastUpdate: Date.now(),
+    achievements: []
+  };
 });
 
 // Run the server
 fastify.listen({ port: 3000 }, function (err, address) {
   if (err) {
-    fastify.log.error(err)
-    process.exit(1)
+    fastify.log.error(err);
+    process.exit(1);
   }
 });
