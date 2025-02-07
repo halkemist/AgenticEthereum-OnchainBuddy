@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "@prisma/client": "^6.3.1",
+    "fastify": "^5.2.1"
+  },
+  "type": "module",
+  "scripts": {
+    "postinstall": "prisma generate",
+    "updatedb": "prisma db push",
+    "studio":"prisma studio"
+  }
+}

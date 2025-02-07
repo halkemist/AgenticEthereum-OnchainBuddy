@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model UserProgress {
+  address             String       @id
+  xp                  Int         @default(0)
+  level              Int         @default(1)
+  transactionsAnalyzed Int       @default(0)
+  lastUpdate         DateTime    @default(now())
+  achievements       Achievement[]
+}
+
+model Achievement {
+  id            String      @id @default(cuid())
+  name          String
+  description   String
+  xpReward      Int
+  dateUnlocked  DateTime
+  userAddress   String
+  userProgress  UserProgress @relation(fields: [userAddress], references: [address])
+}
