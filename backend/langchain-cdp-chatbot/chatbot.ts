@@ -360,4 +360,4 @@ if (require.main === module) {
   });
 }
 
-export { initializeAgent };
+export default initializeAgent;

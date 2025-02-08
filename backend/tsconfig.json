@@ -8,7 +8,9 @@
     "rootDir": "./",
     "strict": true,
     "allowJs": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "include": ["**/*.ts", "**/*.js"],
   "exclude": ["node_modules"]

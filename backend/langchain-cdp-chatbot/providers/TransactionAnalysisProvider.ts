@@ -1,7 +1,5 @@
 import { z } from "zod";
-import { CreateAction } from "@coinbase/agentkit";
-import { ActionProvider } from "@coinbase/agentkit";
-import { Network } from '@coinbase/agentkit';
+import { CreateAction, ActionProvider, Network } from "@coinbase/agentkit";
 import { ethers } from 'ethers';
 import { ChatOpenAI } from "@langchain/openai";
 import { SystemMessage, HumanMessage } from "@langchain/core/messages";
@@ -76,6 +74,10 @@ const UpdateUserProgressSchema = z.object({
   }).optional(),
 });
 
+const StopMonitoringSchema = z.object({
+  userAddress: z.string().describe("Address to stop monitoring")
+});
+
 /**
  * TransactionAnalysisProvider to analyse transactions
  */
@@ -132,17 +134,13 @@ export class TransactionAnalysisProvider extends ActionProvider {
     );
   }
 
-  
-
-  // NEW
-
   @CreateAction({
     name: "monitor_address",
     description: "Monitors an address for new transactions and provides real-time analysis",
     schema: MonitorAddressSchema
   })
   
-  async monitorAddress(args: z.infer<typeof MonitorAddressSchema>): Promise<string> {
+  public async monitorAddress(args: z.infer<typeof MonitorAddressSchema>): Promise<string> {
     const { userAddress, currentLevel } = args;
 
     try {
@@ -293,7 +291,7 @@ export class TransactionAnalysisProvider extends ActionProvider {
           userAddress: z.string().describe("Address to stop monitoring")
       })
   })
-  async stopMonitoring(args: { userAddress: string }): Promise<string> {
+  public async stopMonitoring(args: z.infer<typeof StopMonitoringSchema>): Promise<string> {
       const { userAddress } = args;
       
       const session = this.userSessions.get(userAddress);
@@ -306,8 +304,6 @@ export class TransactionAnalysisProvider extends ActionProvider {
       
       return `Not monitoring address ${userAddress}`;
   }
-
-  // NEW
   
   private async getTransactionsSince(address: string, fromBlock: number): Promise<ethers.TransactionResponse[]> {
     const currentBlock = await this.provider.getBlockNumber();
@@ -335,7 +331,7 @@ export class TransactionAnalysisProvider extends ActionProvider {
       description: "Analyzes a specific transaction with user-level-appropriate explanations",
       schema: AnalyzeTransactionSchema
   })
-  async analyzeTransaction(args: z.infer<typeof AnalyzeTransactionSchema>): Promise<string> {
+  public async analyzeTransaction(args: z.infer<typeof AnalyzeTransactionSchema>): Promise<string> {
     const { txHash, userLevel, isNewTransaction } = args;
 
     try {
@@ -572,7 +568,7 @@ export class TransactionAnalysisProvider extends ActionProvider {
     schema: UpdateUserProgressSchema
   })
 
-  async updateUserProgress(args: z.infer<typeof UpdateUserProgressSchema>): Promise<UserProgress> {
+  public async updateUserProgress(args: z.infer<typeof UpdateUserProgressSchema>): Promise<UserProgress> {
     const { userAddress, action, context } = args;
     const userProgress = await this.getUserProgress(userAddress);
     

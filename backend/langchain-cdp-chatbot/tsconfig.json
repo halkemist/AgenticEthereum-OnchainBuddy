@@ -2,9 +2,9 @@
   "compilerOptions": {
     "preserveSymlinks": true,
     "target": "es2020",
-    "module": "ESNext",           // Changé de commonjs à ESNext
+    "module": "ESNext",    
     "outDir": "./dist",
-    "rootDir": "./",             // Changé de "../" à "./"
+    "rootDir": "./",             
     "strict": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,

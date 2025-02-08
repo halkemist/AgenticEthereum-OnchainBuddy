@@ -1,12 +1,48 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import { PrismaClient } from "@prisma/client";
-import { initializeAgent } from "./langchain-cdp-chatbot/chatbot";
+import initializeAgent from "./langchain-cdp-chatbot/chatbot";
+import { FastifyRequest, FastifyReply } from "fastify";
+
+// Types pour les données
+interface ProgressData {
+  address: string;
+  xp: number;
+  level: number;
+  transactionsAnalyzed: number;
+  lastUpdate: Date;
+  achievements: string[];
+}
+
+// Types pour les requêtes
+interface ProgressRequest extends FastifyRequest {
+  body: ProgressData;
+}
+
+interface AddressParams {
+  Params: { address: string };
+}
+
+interface MonitorRequest extends FastifyRequest {
+  body: { address: string };
+}
+
+interface ExplanationParams {
+  txHash: string;
+}
+
+interface ExplanationQueryString {
+  userLevel?: string;
+}
+
+// Type pour le handler
+type RouteHandler = (request: FastifyRequest, reply: FastifyReply) => Promise<any>;
+
 
 const fastify = Fastify({ logger: true });
 const prisma = new PrismaClient();
 
-let agentInstance;
+let agentInstance: {agent: any; config: any} | undefined;
 
 // Init agent
 async function initAgent() {
@@ -21,7 +57,7 @@ async function initAgent() {
 }
 
 // Auth middleware
-const authenticate = async (request, reply) => {
+const authenticate = async (request: FastifyRequest, reply: FastifyReply) => {
   const apiKey = request.headers['x-api-key'];
   if (apiKey !== process.env.BACKEND_API_KEY) {
     reply.code(401).send({ error: 'Unauthorized' });
@@ -30,14 +66,14 @@ const authenticate = async (request, reply) => {
 };
 
 // Error handler wrapper
-const errorHandler = (fn) => async (request, reply) => {
+const errorHandler = (fn: RouteHandler) => async (request: FastifyRequest, reply: FastifyReply) => {
   try {
     return await fn(request, reply);
   } catch (error) {
     fastify.log.error(error);
     reply.status(500).send({ 
       status: 'error', 
-      message: error.message 
+      message: error instanceof Error ? error.message : 'Unknow errpr' 
     });
   }
 };
@@ -46,8 +82,10 @@ const errorHandler = (fn) => async (request, reply) => {
 fastify.addHook('preHandler', authenticate);
 
 // Routes
-fastify.post('/progress', errorHandler(async (request, reply) => {
-  const progress = request.body;
+fastify.post<{
+  Body: ProgressData
+}>('/progress', errorHandler(async (request, reply) => {
+  const progress = request.body as ProgressData;
   const saved = await prisma.userProgress.upsert({
     where: { address: progress.address },
     update: progress,
@@ -56,8 +94,10 @@ fastify.post('/progress', errorHandler(async (request, reply) => {
   return saved;
 }));
 
-fastify.get('/progress/:address', errorHandler(async (request, reply) => {
-  const { address } = request.params;
+fastify.get<{
+  Params: { address: string }
+}>('/progress/:address', errorHandler(async (request, reply) => {
+  const { address } = request.params as { address: string };
   const progress = await prisma.userProgress.findUnique({
     where: { address }
   });
@@ -71,7 +111,7 @@ fastify.get('/progress/:address', errorHandler(async (request, reply) => {
   };
 }));
 
-fastify.post('/explanation', errorHandler(async (request, reply) => {
+fastify.post('/explanation', errorHandler(async (request: FastifyRequest, reply: FastifyReply) => {
   const explanation = request.body;
   const saved = await prisma.transactionExplanation.create({
     data: explanation
@@ -79,23 +119,10 @@ fastify.post('/explanation', errorHandler(async (request, reply) => {
   return saved;
 }));
 
-fastify.get('/explanation/:txHash', errorHandler(async (request, reply) => {
-  const { txHash } = request.params;
-  const userLevel = parseInt(request.query.userLevel) || 1;
-  
-  const explanation = await prisma.transactionExplanation.findFirst({
-    where: { 
-      transactionHash: txHash,
-      userLevel
-    },
-    orderBy: { createdAt: 'desc' }
-  });
-  
-  return explanation;
-}));
-
-fastify.post('/api/monitor', errorHandler(async (request, reply) => {
-  const { address } = request.body;
+fastify.post<{
+  Body: { address: string }
+}>('/api/monitor', errorHandler(async (request, reply) => {
+  const { address } = request.body as { address: string };
   
   if (!agentInstance) {
     throw new Error('Agent not initialized');
