@@ -73,3 +73,17 @@ $ npx prisma studio
 ```bash
 $ npm run test:analysis
 ```
+
+
+### All .env variables needed
+
+```bash
+OPENAI_API_KEY=your_key
+CDP_API_KEY_NAME=your_key_name
+CDP_API_KEY_PRIVATE_KEY=your_private_key
+BASESCAN_API_KEY=your_key
+BACKEND_API_URL=http://your-backend
+BACKEND_API_KEY=your_backend_key
+BASE_RPC_URL=https://mainnet.base.org
+NETWORK_ID=base-mainnet
+```
