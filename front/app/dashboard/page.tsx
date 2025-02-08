@@ -50,7 +50,10 @@ const Dashboard: React.FC = () => {
   const loadUserProgress = async () => {
     if (!api) return;
     
-    const backendApi = new BackendAPI(process.env.BACKEND_API_KEY || '', process.env.BACKEND_API_URL || '')
+    const backendApi = new BackendAPI(
+      process.env.NEXT_PUBLIC_BACKEND_API_KEY || '', 
+      process.env.NEXT_PUBLIC_BACKEND_API_URL || ''
+    )
     return await backendApi.getUserProgress(address as `0x${string}`);
   };
 

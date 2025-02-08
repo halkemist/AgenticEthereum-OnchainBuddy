@@ -18,8 +18,8 @@ model TransactionExplanation {
   transactionHash String
   userLevel       Int
   userAddress     String
-  explanation     String    @db.Text
-  riskAnalysis    String    @db.Text
+  explanation     String
+  riskAnalysis    String
   createdAt       DateTime  @default(now())
 }
 

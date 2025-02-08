@@ -13,16 +13,15 @@ export class BlockchainEducatorAgent {
   }
 
   async monitorAddress(address: string) {
-    try {
-      // TODO: call the correct function using address
-      return {
-        status: 'monitoring',
-        address
-      };
-    } catch (error) {
-      console.error('Address monitoring error:', error);
-      throw error;
-    }
+    const response = await fetch(`${this.baseUrl}/api/monitor`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.NEXT_PUBLIC_BACKEND_API_KEY 
+      },
+      body: JSON.stringify({ address })
+    });
+    return response.json();
   }
 }
 
