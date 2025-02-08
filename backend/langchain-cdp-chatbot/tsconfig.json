@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "preserveSymlinks": true,
+    "target": "es2020",
+    "module": "ESNext",           // Changé de commonjs à ESNext
+    "outDir": "./dist",
+    "rootDir": "./",             // Changé de "../" à "./"
+    "strict": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "noImplicitAny": false,
+    "removeComments": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/tests/**/**"
+  ]
+}

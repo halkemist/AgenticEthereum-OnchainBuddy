@@ -1,15 +1,24 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import { PrismaClient } from "@prisma/client";
-import { initializeAgent } from "./lib/agentkit/typescript/examples/langchain-cdp-chatbot/chatbot.ts";
+import { initializeAgent } from "./langchain-cdp-chatbot/chatbot";
 
 const fastify = Fastify({ logger: true });
 const prisma = new PrismaClient();
 
-// Cors
-await fastify.register(cors, {
-  origin: true
-});
+let agentInstance;
+
+// Init agent
+async function initAgent() {
+  try {
+    const { agent, config } = await initializeAgent();
+    agentInstance = { agent, config };
+    console.log('Agent initialized successfully');
+  } catch (error) {
+    console.error('Failed to initialize agent:', error);
+    process.exit(1);
+  }
+}
 
 // Auth middleware
 const authenticate = async (request, reply) => {
@@ -88,8 +97,11 @@ fastify.get('/explanation/:txHash', errorHandler(async (request, reply) => {
 fastify.post('/api/monitor', errorHandler(async (request, reply) => {
   const { address } = request.body;
   
-  const { agent } = await initializeAgent();
-  const result = await agent.invoke({
+  if (!agentInstance) {
+    throw new Error('Agent not initialized');
+  }
+
+  const result = await agentInstance.agent.invoke({
     messages: [{
       type: "human",
       content: `Monitor address ${address}`
@@ -102,6 +114,12 @@ fastify.post('/api/monitor', errorHandler(async (request, reply) => {
 // Run the server
 const start = async () => {
   try {
+    await initAgent();
+
+    await fastify.register(cors, {
+      origin: true
+    });
+
     await fastify.listen({ port: 3000 });
     console.log('Server running at http://localhost:3000');
   } catch (err) {
