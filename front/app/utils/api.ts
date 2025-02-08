@@ -1,59 +1,74 @@
-// Types
-interface NetworkConfig {
-  baseUrl: string;
-  apiKey: string | undefined;
-}
-interface NetworkConfigs {
-  [networkID: string]: NetworkConfig;
-}
-interface BasicTransaction {
-  hash: string;
-  [key: string]: any;
-}
-interface ApiResponse {
-  status: string;
-  message: string;
-  result: BasicTransaction[];
-}
+import { initializeAgent } from './../lib/agentkit/typescript/examples/langchain-cdp-chatbot/chatbot';
 
-// Functions
-export async function getTransactions(address: string, networkID: string, limit: string) {
-  const NETWORK_CONFIGS: NetworkConfigs = {
-    'base-mainnet': {
-      baseUrl: 'https://api.basescan.org/api',
-      apiKey: process.env.NEXT_PUBLIC_BASESCAN_API_KEY
-    }
-  } as const;
+export class BlockchainEducatorAgent {
+  private agent: any;
+  private config: any;
 
-  const config = NETWORK_CONFIGS[networkID];
-  if (!config) {
-    throw new Error(`Network configuration not found for ${networkID}`);
-  }
-  
-  // Get normal transactions
-  const normalTxsResponse = await fetch(
-    `${config.baseUrl}?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=${limit}&sort=desc&apikey=${config.apiKey}`
-  );
-  const normalTxs: ApiResponse = await normalTxsResponse.json();
+  constructor() {}
 
-  if (normalTxs.status === '0') {
-    throw new Error(normalTxs.message);
+  async initialize() {
+    const { agent, config: agentConfig } = await initializeAgent();
+    this.agent = agent;
+    this.config = agentConfig;
   }
 
-  // Get internal transactions of the normal transactions
-  const enrichedTxs = await Promise.all(
-    normalTxs.result.map(async (tx) => {
-      const internalTxsResponse = await fetch(
-        `${config.baseUrl}?module=account&action=txlistinternal&txhash=${tx.hash}&apikey=${config.apiKey}`
-      );
-      const internalTxs: ApiResponse = await internalTxsResponse.json();
-
+  async monitorAddress(address: string) {
+    try {
+      // TODO: call the correct function using address
       return {
-        ...tx,
-        internal_transactions: internalTxs.status === '1' ? internalTxs.result : []
+        status: 'monitoring',
+        address
       };
-    })
-  );
+    } catch (error) {
+      console.error('Address monitoring error:', error);
+      throw error;
+    }
+  }
+}
 
-  return enrichedTxs;
+export class BackendAPI {
+  private apiKey: string;
+  private baseUrl: string;
+
+  constructor(apiKey: string, baseUrl: string = 'http://localhost:3000') {
+    this.apiKey = apiKey;
+    this.baseUrl = baseUrl;
+  }
+
+  async getUserProgress(address: string): Promise<{
+    address: string;
+    xp: number;
+    level: number;
+    transactionsAnalyzed: number;
+    lastUpdate: number;
+    achievements: string[];
+  }> {
+    try {
+      const response = await fetch(`${this.baseUrl}/progress/${address}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': this.apiKey
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Failed to fetch user progress:', error);
+      
+      return {
+        address,
+        xp: 0,
+        level: 1,
+        transactionsAnalyzed: 0,
+        lastUpdate: Date.now(),
+        achievements: []
+      };
+    }
+  }
 }

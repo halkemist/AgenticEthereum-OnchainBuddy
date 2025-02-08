@@ -1,48 +1,68 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useAccount } from 'wagmi';
 import { SmartToy as BotIcon } from '@mui/icons-material';
-
-import { getTransactions } from '../utils/api';
-
-// Types
-interface Transaction {
-  id: string;
-  type: string;
-  timestamp: number;
-  description: string;
-  aiExplanation: string;
-  amount?: string;
-  token?: string;
-  platform?: string;
-}
-interface UserProgress {
-  level: number;
-  xp: number;
-  maxXp: number;
-}
+import { motion, AnimatePresence } from 'framer-motion';
+import { BlockchainEducatorAgent, BackendAPI } from '../utils/api';
+import { type Transaction, type Stats, type UserProgress, type Notification } from "./../lib/types";
 
 const Dashboard: React.FC = () => {
+  const { address } = useAccount();
+  const [api, setApi] = useState<BlockchainEducatorAgent | null>(null);
 
-  // State
+  // States
   const [userProgress, setUserProgress] = useState<UserProgress>({
     level: 1,
     xp: 250,
     maxXp: 1000
   });
 
-  const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([
-    {
-      id: '1',
-      type: 'Token Swap',
-      timestamp: Date.now() - 7200000, // 720000ms = 2 hours ago
-      description: 'You swapped 0.1 ETH for 100 USDC on Uniswap',
-      aiExplanation: 'This was a basic swap transaction with a 0.3% fee. The price impact was minimal.',
-      amount: '0.1',
-      token: 'ETH',
-      platform: 'Uniswap'
+  const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [stats, setStats] = useState<Stats>({
+    totalTransactions: 0,
+    uniqueContracts: 0,
+    defiInteractions: 0,
+    riskLevel: 'safe'
+  });
+
+  // Initialize API and monitoring
+  useEffect(() => {
+    if (address) {
+      const newApi = new BlockchainEducatorAgent();
+      setApi(newApi);
+
+      const initAgent = async () => {
+        await newApi.initialize();
+      };
+    
+      initAgent();
+      
+      // Start monitoring
+      newApi.monitorAddress(address);
+      
+      // Load initial user progress
+      loadUserProgress();
     }
-  ]);
+  }, [address]);
+
+  const loadUserProgress = async () => {
+    if (!api) return;
+    
+    const backendApi = new BackendAPI(process.env.BACKEND_API_KEY || '', process.env.BACKEND_API_URL || '')
+    return await backendApi.getUserProgress(address as `0x${string}`);
+  };
+
+  const addNotification = ({ message, type }: { message: string, type: 'achievement' | 'levelUp' }) => {
+    const id = Date.now().toString();
+    setNotifications(prev => [...prev, { id, message, type }]);
+    
+    // Remove notification after 5 seconds
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== id));
+    }, 5000);
+  };
 
   // Format timestamp to relative time
   const formatRelativeTime = (timestamp: number): string => {
@@ -52,19 +72,23 @@ const Dashboard: React.FC = () => {
     return new Date(timestamp).toLocaleDateString();
   };
 
-  // TEST PART
-  /////////////////////
-  const testAddress = "0xEdb06c2Fc7cA9EBBCf83A3301482b79214E26404";
-
-  async function handleTest() {
-    const txs = await getTransactions(testAddress, "base-mainnet", "10");
-    console.log(txs)
-  }
-  //////////////////
-  // END TEST PART
-
   return (
     <>
+      {/* Notifications */}
+      <AnimatePresence>
+        {notifications.map((notif) => (
+          <motion.div
+            key={notif.id}
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            className="fixed bottom-4 right-4 bg-blue-500 text-white p-4 rounded-lg shadow-lg"
+          >
+            {notif.type === 'levelUp' ? '🎉' : '🏆'} {notif.message}
+          </motion.div>
+        ))}
+      </AnimatePresence>
+
       {/* AI Assistant Chat Bubble */}
       <div className="max-w-2xl mx-auto mb-8 bg-white rounded-lg shadow-lg p-6">
         <div className="flex items-start space-x-4">
@@ -95,10 +119,6 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className='bg-white h-8 w-1/2'>
-        <button onClick={handleTest}>TEST</button>
-      </div>
-
       {/* Recent Transactions */}
       <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6">
         <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
@@ -125,7 +145,7 @@ const Dashboard: React.FC = () => {
 
           {recentTransactions.length === 0 && (
             <div className="text-center text-gray-500 py-8">
-              No transactions yet. Connect your wallet to get started!
+              No transactions yet. Start interacting with the blockchain to see your activity!
             </div>
           )}
         </div>
@@ -136,7 +156,23 @@ const Dashboard: React.FC = () => {
         <div className="bg-white rounded-lg shadow p-4">
           <h3 className="text-sm text-gray-500">Total Transactions</h3>
           <p className="text-2xl font-bold text-gray-800">
-            {recentTransactions.length}
+            {stats.totalTransactions}
+          </p>
+        </div>
+        <div className="bg-white rounded-lg shadow p-4">
+          <h3 className="text-sm text-gray-500">DeFi Interactions</h3>
+          <p className="text-2xl font-bold text-gray-800">
+            {stats.defiInteractions}
+          </p>
+        </div>
+        <div className="bg-white rounded-lg shadow p-4">
+          <h3 className="text-sm text-gray-500">Risk Level</h3>
+          <p className={`text-2xl font-bold ${
+            stats.riskLevel === 'safe' ? 'text-green-600' : 
+            stats.riskLevel === 'warning' ? 'text-yellow-600' : 
+            'text-red-600'
+          }`}>
+            {stats.riskLevel.toUpperCase()}
           </p>
         </div>
         <div className="bg-white rounded-lg shadow p-4">
@@ -149,6 +185,12 @@ const Dashboard: React.FC = () => {
           <h3 className="text-sm text-gray-500">XP to Next Level</h3>
           <p className="text-2xl font-bold text-gray-800">
             {userProgress.maxXp - userProgress.xp}
+          </p>
+        </div>
+        <div className="bg-white rounded-lg shadow p-4">
+          <h3 className="text-sm text-gray-500">Unique Contracts</h3>
+          <p className="text-2xl font-bold text-gray-800">
+            {stats.uniqueContracts}
           </p>
         </div>
       </div>
