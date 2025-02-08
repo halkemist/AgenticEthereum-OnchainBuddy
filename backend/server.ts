@@ -1,24 +1,7 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import { PrismaClient } from "@prisma/client";
-import { initializeAgent } from "./lib/agentkit/typescript/examples/langchain-cdp-chatbot";
-
-interface Progress {
-  address: string;
-  xp: number;
-  level: number;
-  transactionsAnalyzed: number;
-  lastUpdate: Date;
-  achievements: string[];
-}
-
-interface Explanation {
-  transactionHash: string;
-  userLevel: number;
-  explanation: string;
-  riskAnalysis?: string;
-  userAddress?: string;
-}
+import { initializeAgent } from "./lib/agentkit/typescript/examples/langchain-cdp-chatbot/chatbot.ts";
 
 const fastify = Fastify({ logger: true });
 const prisma = new PrismaClient();
@@ -29,7 +12,7 @@ await fastify.register(cors, {
 });
 
 // Auth middleware
-const authenticate = async (request: any, reply: any) => {
+const authenticate = async (request, reply) => {
   const apiKey = request.headers['x-api-key'];
   if (apiKey !== process.env.BACKEND_API_KEY) {
     reply.code(401).send({ error: 'Unauthorized' });
@@ -38,7 +21,7 @@ const authenticate = async (request: any, reply: any) => {
 };
 
 // Error handler wrapper
-const errorHandler = (fn: Function) => async (request: any, reply: any) => {
+const errorHandler = (fn) => async (request, reply) => {
   try {
     return await fn(request, reply);
   } catch (error) {
@@ -55,7 +38,7 @@ fastify.addHook('preHandler', authenticate);
 
 // Routes
 fastify.post('/progress', errorHandler(async (request, reply) => {
-  const progress = request.body as Progress;
+  const progress = request.body;
   const saved = await prisma.userProgress.upsert({
     where: { address: progress.address },
     update: progress,
@@ -65,7 +48,7 @@ fastify.post('/progress', errorHandler(async (request, reply) => {
 }));
 
 fastify.get('/progress/:address', errorHandler(async (request, reply) => {
-  const { address } = request.params as { address: string };
+  const { address } = request.params;
   const progress = await prisma.userProgress.findUnique({
     where: { address }
   });
@@ -80,7 +63,7 @@ fastify.get('/progress/:address', errorHandler(async (request, reply) => {
 }));
 
 fastify.post('/explanation', errorHandler(async (request, reply) => {
-  const explanation = request.body as Explanation;
+  const explanation = request.body;
   const saved = await prisma.transactionExplanation.create({
     data: explanation
   });
@@ -88,8 +71,8 @@ fastify.post('/explanation', errorHandler(async (request, reply) => {
 }));
 
 fastify.get('/explanation/:txHash', errorHandler(async (request, reply) => {
-  const { txHash } = request.params as { txHash: string };
-  const userLevel = parseInt(request.query.userLevel as string) || 1;
+  const { txHash } = request.params;
+  const userLevel = parseInt(request.query.userLevel) || 1;
   
   const explanation = await prisma.transactionExplanation.findFirst({
     where: { 
@@ -103,13 +86,15 @@ fastify.get('/explanation/:txHash', errorHandler(async (request, reply) => {
 }));
 
 fastify.post('/api/monitor', errorHandler(async (request, reply) => {
-  const { address } = request.body as { address: string };
+  const { address } = request.body;
   
-  const { agent, config } = await initializeAgent();
+  const { agent } = await initializeAgent();
   const result = await agent.invoke({
-    tool: "monitor_address",
-    toolInput: { address }
-  }, config);
+    messages: [{
+      type: "human",
+      content: `Monitor address ${address}`
+    }]
+  });
   
   return { status: 'success', data: result };
 }));

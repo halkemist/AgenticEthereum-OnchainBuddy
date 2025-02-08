@@ -8,9 +8,11 @@
   },
   "type": "module",
   "scripts": {
+    "dev": "tsx watch server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
     "updatedb": "prisma db push",
-    "studio": "prisma studio",
-    "start:server": "node server.js"
+    "studio": "prisma studio"
   },
   "devDependencies": {
     "@types/node": "^22.13.1",
