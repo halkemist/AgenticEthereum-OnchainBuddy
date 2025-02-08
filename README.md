@@ -46,3 +46,24 @@ User Wallet --> OnchainKit --> Frontend --> Query Last User Transactions --> Age
 ## Blockchain
 
 I chose Base because of low fees transaction cost and fast confirmations.
+
+## How to use (dev)
+
+#### Backend - Run the server
+
+```bash
+$ npm run server
+```
+
+#### Backend - Generate DB
+
+```bash
+$ npx prisma generate
+$ npx prisma db push
+```
+
+#### Backend - Open Studio
+
+```bash
+$ npx prisma studio
+```

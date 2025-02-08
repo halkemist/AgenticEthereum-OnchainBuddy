@@ -1,12 +1,15 @@
 {
   "dependencies": {
     "@prisma/client": "^6.3.1",
+    "dotenv": "^16.4.7",
+    "ethers": "^6.13.5",
     "fastify": "^5.2.1"
   },
   "type": "module",
   "scripts": {
     "postinstall": "prisma generate",
     "updatedb": "prisma db push",
-    "studio":"prisma studio"
+    "studio": "prisma studio",
+    "test:analysis": "ts-node tests/integration/transactionAnalysis.test.ts"
   }
 }
