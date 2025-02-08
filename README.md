@@ -52,7 +52,7 @@ I chose Base because of low fees transaction cost and fast confirmations.
 #### Backend - Run the server
 
 ```bash
-$ npm run server
+$ npm run start:server
 ```
 
 #### Backend - Generate DB
@@ -66,4 +66,10 @@ $ npx prisma db push
 
 ```bash
 $ npx prisma studio
+```
+
+#### Agent - Run Tests
+
+```bash
+$ npm run test:analysis
 ```

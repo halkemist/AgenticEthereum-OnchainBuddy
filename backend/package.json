@@ -10,6 +10,12 @@
     "postinstall": "prisma generate",
     "updatedb": "prisma db push",
     "studio": "prisma studio",
-    "test:analysis": "ts-node tests/integration/transactionAnalysis.test.ts"
+    "start:server": "node server.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.1",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
   }
 }
