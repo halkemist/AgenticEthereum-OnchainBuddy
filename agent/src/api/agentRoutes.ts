@@ -1,11 +1,11 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { AgentService } from '../services/AgentService';
 import { authenticateApiKey } from '../middleware/auth';
 
-const router = express.Router();
+const router: Router = express.Router();
 
 // Auth Middleware
-router.use(authenticateApiKey);
+router.use(authenticateApiKey as express.RequestHandler);
 
 // GET /api/agent/health - Check Service Health
 router.get('/health', (req, res) => {

@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import * as dotenv from "dotenv";
+import agentRoutes from "./api/agentRoutes";
+import { createAgentService } from "./services/AgentService";
 
 function validateEnvironment() {
   const requiredEnvVars = [
@@ -9,8 +11,8 @@ function validateEnvironment() {
     'CDP_API_KEY_PRIVATE_KEY',
     'BASESCAN_API_KEY',
     'BASE_RPC_URL',
-    'BACKEND_API_KEY',
-    'BACKEND_API_URL'
+    'AGENT_API_KEY',
+    'AGENT_API_URL'
   ];
 
   const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
@@ -38,7 +40,24 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Initialize Agent
+const agentService = createAgentService({
+  apiKeyName: process.env.CDP_API_KEY_NAME!,
+  apiKeyPrivateKey: process.env.CDP_API_KEY_PRIVATE_KEY!,
+  networkId: process.env.NETWORK_ID || 'base-mainnet',
+  openAIApiKey: process.env.OPENAI_API_KEY!,
+  basescanApiKey: process.env.BASESCAN_API_KEY!,
+  baseRpcUrl: process.env.BASE_RPC_URL!,
+  backendApiKey: process.env.AGENT_API_KEY!,
+  backendApiUrl: process.env.AGENT_API_URL!
+});
+
+// Store service in local to use it in routes
+app.locals.agentService = agentService;
+
 // Routes
+app.use('/api/agent', agentRoutes);
+
 app.get('/health', (req, res) => {
   res.json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
@@ -53,12 +72,23 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
   });
 });
 
-// Start server
-const PORT = process.env.PORT || 5000;
+// Initialization Function
+async function initializeApp() {
+  try {
+    await agentService.initialize();
+    
+    const port = process.env.PORT || 5000;
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
+  } catch (error) {
+    console.error('Failed to initialize application:', error);
+    process.exit(1);
+  }
+}
 
-app.listen(PORT, () => {
-  console.log('Server runnning at port ' + PORT);
-})
+// Start Application
+initializeApp();
 
 process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception:', error);
