@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 const authenticate = async (request, reply) => {
   const apiKey = request.headers['x-api-key'];
 
-  if (apiKey !== process.env.API_KEY) {
+  if (apiKey !== process.env.BACKEND_API_KEY) {
     reply.code(401).send({ error: 'Unauthorized' })
     return;
   }
@@ -41,6 +41,29 @@ fastify.get('/progress/:address', async (request, reply) => {
     lastUpdate: Date.now(),
     achievements: []
   };
+});
+
+fastify.post('/explanation', async (request, reply) => {
+  const explanation = request.body;
+  const saved = await prisma.transactionExplanation.create({
+    data: explanation
+  });
+  return saved;
+});
+
+fastify.get('/explanation/:txHash', async (request, reply) => {
+  const { txHash } = request.params;
+  const userLevel = parseInt(request.query.userLevel) || 1;
+  
+  const explanation = await prisma.transactionExplanation.findFirst({
+    where: { 
+      transactionHash: txHash,
+      userLevel
+    },
+    orderBy: { createdAt: 'desc' }
+  });
+  
+  return explanation;
 });
 
 // Run the server

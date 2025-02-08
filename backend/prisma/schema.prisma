@@ -13,6 +13,16 @@ datasource db {
   url      = "file:./dev.db"
 }
 
+model TransactionExplanation {
+  id              String    @id @default(cuid())
+  transactionHash String
+  userLevel       Int
+  userAddress     String
+  explanation     String    @db.Text
+  riskAnalysis    String    @db.Text
+  createdAt       DateTime  @default(now())
+}
+
 model UserProgress {
   address             String       @id
   xp                  Int         @default(0)
