@@ -1,28 +1,13 @@
-import { initializeAgent } from './../lib/agentkit/typescript/examples/langchain-cdp-chatbot/chatbot';
 
-export class BlockchainEducatorAgent {
-  private agent: any;
-  private config: any;
-
-  constructor() {}
-
-  async initialize() {
-    const { agent, config: agentConfig } = await initializeAgent();
-    this.agent = agent;
-    this.config = agentConfig;
-  }
-
-  async monitorAddress(address: string) {
-    const response = await fetch(`${this.baseUrl}/api/monitor`, {
+export class AgentAPI {
+   async monitoring(address: string): Promise {
+    const response = await fetch('http://localhost:5000/api/monitor', {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.NEXT_PUBLIC_BACKEND_API_KEY 
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ address })
     });
     return response.json();
-  }
+  };
 }
 
 export class BackendAPI {
