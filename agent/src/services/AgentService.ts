@@ -22,6 +22,7 @@ interface MonitoringStatus {
   startTime: number;
   lastChecked: number;
   isActive: boolean;
+  threadId: string;
 }
 
 export class AgentService extends EventEmitter {
@@ -178,6 +179,8 @@ export class AgentService extends EventEmitter {
       throw new Error('Agent service not initialized');
     }
 
+    console.log('START MONITORING FUNCTION')
+
     try {
       // Vérifier si l'adresse est déjà surveillée
       if (this.monitoredAddresses.has(address)) {
@@ -190,21 +193,45 @@ export class AgentService extends EventEmitter {
         }
       }
 
-      // Démarrer la surveillance
-      await this.agent.execute("monitor_address", {
-        userAddress: address,
-        currentLevel: 1 // Niveau de départ
-      });
+      console.log('before start action')
+
+      const actionInput = {
+        messages: [
+          {
+            role: "user",
+            content: JSON.stringify({
+              action: "monitor_address",
+              args: {
+                userAddress: address,
+                currentLevel: 1
+              }
+            })
+          }
+        ]
+      };
+  
+      // Configuration avec thread_id pour l'invocation
+      const config = {
+        configurable: {
+          thread_id: `monitoring-${address}-${Date.now()}`
+        }
+      };
+  
+      await this.agent.invoke(actionInput, config);
 
       // Enregistrer le statut de surveillance
+      const threadId = `monitoring_${address}_${Date.now()}`;
       this.monitoredAddresses.set(address, {
         address,
         startTime: Date.now(),
         lastChecked: Date.now(),
-        isActive: true
+        isActive: true,
+        threadId
       });
 
       this.emit('monitoring:started', { address });
+
+      console.log('monitoring started')
 
       return {
         success: true,
@@ -233,7 +260,10 @@ export class AgentService extends EventEmitter {
         };
       }
 
-      await this.agent.execute("stop_monitoring", { userAddress: address });
+      await this.agent.invoke({
+        input: `stop_monitoring ${address}`,
+        config: { userAddress: address }
+      });
 
       this.monitoredAddresses.set(address, {
         ...status,

@@ -32,6 +32,18 @@ export class TransactionAnalysisProvider extends ActionProvider {
   private readonly apiKey: string;
   private llm?: ChatOpenAI;
   private userSessions: Map<string, UserSession>;
+
+  private logger = {
+    info: (message: string, ...args: any[]) => {
+      console.log(`[TransactionAnalysisProvider] ${message}`, ...args);
+    },
+    error: (message: string, ...args: any[]) => {
+      console.error(`[TransactionAnalysisProvider] ${message}`, ...args);
+    },
+    debug: (message: string, ...args: any[]) => {
+      console.debug(`[TransactionAnalysisProvider] ${message}`, ...args);
+    }
+  };
   
   // XP System Configuration
   private readonly XP_ACTIONS: Record<string, XPEvent> = {
@@ -44,6 +56,13 @@ export class TransactionAnalysisProvider extends ActionProvider {
 
   constructor(config: TransactionConfig) {
     super("enhanced_transaction_analysis", []);
+
+    console.log('[TransactionAnalysisProvider] Provider instantiated with config:', {
+      basescanApiKey: !!config.basescanApiKey,
+      rpcUrl: config.rpcUrl,
+      supportedNetworks: config.supportedNetworks
+    });
+
     this.lastKnownTx = {};
     this.basescanApiKey = config.basescanApiKey;
     this.provider = new ethers.JsonRpcProvider(config.rpcUrl);
@@ -79,14 +98,19 @@ export class TransactionAnalysisProvider extends ActionProvider {
     const { userAddress, currentLevel } = args;
 
     try {
+      this.logger.info('Starting monitor_address action', { userAddress, currentLevel });
+
       const existingSession = this.userSessions.get(userAddress);
       if (existingSession?.isActive) {
+        this.logger.info('Address already being monitored', { userAddress });
         return `Already monitoring address ${userAddress}`;
       }
 
+      this.logger.info('Setting up new monitoring session', { userAddress });
       const lastCheckedBlock = await this.provider.getBlockNumber();
       
       const intervalId = setInterval(async () => {
+        this.logger.debug('Running periodic transaction check', { userAddress });
         await this.checkNewTransactions(userAddress, currentLevel);
       }, 30000);
 
@@ -98,6 +122,7 @@ export class TransactionAnalysisProvider extends ActionProvider {
         pendingTransactions: new Set()
       });
       
+      this.logger.info('Successfully started monitoring', { userAddress });
       return `Started monitoring address ${userAddress}`;
     } catch (error) {
       return `Error monitoring address: ${error instanceof Error ? error.message : 'Unknown error'}`;
@@ -317,6 +342,8 @@ export class TransactionAnalysisProvider extends ActionProvider {
 
   private async checkNewTransactions(userAddress: string, currentLevel: number): Promise<void> {
     try {
+      console.log('new check')
+
       const session = this.userSessions.get(userAddress);
       if (!session || !session.isActive) return;
 

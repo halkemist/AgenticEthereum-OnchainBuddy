@@ -1,9 +1,12 @@
 
 export class AgentAPI {
-   async monitoring(address: string): Promise {
-    const response = await fetch('http://localhost:5000/api/monitor', {
+   async monitoring(address: string): Promise<any> {
+    const response = await fetch('http://localhost:5000/api/agent/monitor', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.NEXT_PUBLIC_BACKEND_API_KEY || 'todo'
+      },
       body: JSON.stringify({ address })
     });
     return response.json();

@@ -4,12 +4,11 @@ import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { SmartToy as BotIcon } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BlockchainEducatorAgent, BackendAPI } from '../utils/api';
+import { AgentAPI, BackendAPI } from '../utils/api';
 import { type Transaction, type Stats, type UserProgress, type Notification } from "./../lib/types";
 
 const Dashboard: React.FC = () => {
   const { address } = useAccount();
-  const [api, setApi] = useState<BlockchainEducatorAgent | null>(null);
 
   // States
   const [userProgress, setUserProgress] = useState<UserProgress>({
@@ -30,17 +29,10 @@ const Dashboard: React.FC = () => {
   // Initialize API and monitoring
   useEffect(() => {
     if (address) {
-      const newApi = new BlockchainEducatorAgent();
-      setApi(newApi);
-
-      const initAgent = async () => {
-        await newApi.initialize();
-      };
-    
-      initAgent();
-      
+      const newApi = new AgentAPI();
+          
       // Start monitoring
-      newApi.monitorAddress(address);
+      newApi.monitoring(address);
       
       // Load initial user progress
       loadUserProgress();
@@ -48,8 +40,6 @@ const Dashboard: React.FC = () => {
   }, [address]);
 
   const loadUserProgress = async () => {
-    if (!api) return;
-    
     const backendApi = new BackendAPI(
       process.env.NEXT_PUBLIC_BACKEND_API_KEY || '', 
       process.env.NEXT_PUBLIC_BACKEND_API_URL || ''
