@@ -61,3 +61,19 @@ export interface RiskFactors {
   complexData: boolean;
   highGasPrice: boolean;
 }
+
+export interface BasescanResponse {
+  status: string;
+  result: string | any[];
+  message: string;
+}
+
+export interface BasescanTxResponse extends BasescanResponse {
+  result: {
+    hash: string;
+  }[];
+}
+
+export interface BasescanContractResponse extends BasescanResponse {
+  result: string;
+}
