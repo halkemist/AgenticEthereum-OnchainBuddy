@@ -148,6 +148,6 @@ NETWORK_ID=base-mainnet
 - Powered by Coinbase's AgentKit
 - Base Network for infrastructure support
 
-## More Details (contains wireframes and initial specs)
+## Wireframes
 
-[OnchainBuddy Notion](https://www.notion.so/ETHGlobal_OnchainBuddy-18fa0cf912048044a489c3bb8ddce7f3?pvs=4)
+[OnchainBuddy Notion](https://www.notion.so/Mockups-Wireframes-18fa0cf912048082a011f0a3bfa3cb4f?pvs=4)
