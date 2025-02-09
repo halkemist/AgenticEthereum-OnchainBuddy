@@ -1,4 +1,4 @@
-# AgenticEthereum-OnchainBuddy
+# 🚀 AgenticEthereum-OnchainBuddy
 
 Onchain Buddy is an AI assistant that helps beginners understand their blockchain activities. It analyzes transactions, explains them in simple terms, and guides users to learn about blockchain in a safe and proper way.
 
@@ -6,74 +6,128 @@ As your personal blockchain companion he acts as a real-time translator between 
 
 To making your first token swap or approving a new smart contract, it break down each action in clear and understandable explanations.
 
-## More Details
+## 🏗 Architecture
 
-[OnchainBuddy Notion](https://www.notion.so/ETHGlobal_OnchainBuddy-18fa0cf912048044a489c3bb8ddce7f3?pvs=4)
+The project is divided into three main components:
 
-## Stack
+### Backend
+- Handles user data persistence
+- Manages XP and achievements system
+- Provides API endpoints for frontend
 
-- Solidity
-- Next
-- Wagmi, Viem, Ethers
-- TailwindCSS
-- MUI
-- OnchainKit by Coinbase (wallet integration)
-- AgentKit
+### Agent
+- Processes blockchain transactions
+- Generates explanations using GPT-4
+- Monitors wallet activity
+- Assesses transaction risks
 
-## AI Agent features
+### Frontend
+- User interface for wallet connection
+- Displays transaction explanations
+- Shows progression system
+- Presents achievements
 
-- Provide explanations of user transactions
-- Provide explanations of user approvals
-- Alert the user if a transaction looks risky
-- Daily suggestion based on yser activity
-- Update your level if you deserve it
+## Workflow
 
-NB: Explanation depends on your current level
+![Workflow Image](./assets/onchainbuddy_workflow.svg)
 
-## User Interface
+## Features
 
-### Pages
+### User Interface
+- Connect your wallet to get started 
+- See detailed transaction explanations adapted to your level
+- Track your blockchain learning progression through levels and XP
+- Earn achievements for blockchain milestones
+- Get real-time risk alerts for transactions
 
-- Dashboard
-- Transaction Explorer
-- Learning Center
-- Settings
+### Agent
+- **Smart Transaction Monitoring**
+  - Real-time tracking of wallet activity
+  - Automatic detection of new transactions
+  - Immediate analysis and notifications
 
-## Flow
+- **Intelligent Analysis System**
+  - Detailed explanation of transaction mechanics
+  - Risk assessment and safety recommendations
+  - Level-appropriate explanations that evolve with user expertise
+  - Support for ETH transfers, ERC20 operations and complex contract interactions
 
-User Wallet --> OnchainKit --> Frontend --> Query Last User Transactions --> AgentKit --> Frontend
+- **Educational Progression System**
+  - Dynamic XP system with multipliers based on:
+    - Transaction complexity
+    - Consecutive daily activity
+    - New contract interactions
+    - Risk identification
+  - Achievements system to reward learning milestones
+  - 3-tier progression: Beginner (1-30), Intermediate (31-70), Expert (71-100)
 
-## Blockchain
+- **Risk Assessment**
+  - Smart contract verification checks
+  - Gas usage analysis
+  - Value transfer monitoring
+  - Contract interaction complexity evaluation
+  - Custom safety recommendations
 
-I chose Base because of low fees transaction cost and fast confirmations.
+- **Transaction Details Processing**
+  - Gas cost calculation
+  - Method identification
+  - Event logging and analysis
+  - Contract interaction decoding
+  - Value transfer tracking
+
+## 🔧 Technology Stack
+- Built on Base Network
+- Powered by GPT-40-mini for natural language processing
+- Uses Basescan API for blockchain data
+- Real-time monitoring through Base RPC
+- AgentKit as AI agent
+
+#### Frontend
+- **Next.js** - React framework for production
+- **TailwindCSS** - Utility-first CSS framework
+- **Material-UI (MUI)** - React UI component library
+
+#### Blockchain Integration
+- **Ethers.js** - Ethereum wallet operations and smart contract interactions
+- **OnchainKit** - Coinbase's wallet integration toolkit
+- **AgentKit** - AI agent framework for blockchain
+- **Solidity** - Smart contract development
+
+#### Backend & Infrastructure
+- Built on Base Network
+- Powered by GPT-4 for natural language processing
+- Uses Basescan API for blockchain data
+- Real-time monitoring through Base RPC
 
 ## How to use (dev)
 
-#### Backend - Run the server
+### Backend
 
+#### Prepare DB and run server
 ```bash
-$ npm run start:server
-```
-
-#### Backend - Generate DB
-
-```bash
+$ cd backend/
+$ npm install
 $ npx prisma generate
 $ npx prisma db push
+$ node server.js
 ```
+### Agent
 
-#### Backend - Open Studio
-
+#### Run server
 ```bash
-$ npx prisma studio
+$ cd agent/
+$ npm install
+$ npx ts-node src/app.ts
 ```
 
-#### Agent - Run Tests
+### Frontend
 
+#### Start
 ```bash
-$ npm run test:analysis
+$ cd front/
+$ npm install
+$ npm run dev
 ```
-
 
 ### All .env variables needed
 
@@ -87,3 +141,13 @@ BACKEND_API_KEY=your_backend_key
 BASE_RPC_URL=https://mainnet.base.org
 NETWORK_ID=base-mainnet
 ```
+
+## 🙏 Acknowledgments
+
+- Built during ETHGlobal Hackathon
+- Powered by Coinbase's AgentKit
+- Base Network for infrastructure support
+
+## More Details (contains wireframes and initial specs)
+
+[OnchainBuddy Notion](https://www.notion.so/ETHGlobal_OnchainBuddy-18fa0cf912048044a489c3bb8ddce7f3?pvs=4)
